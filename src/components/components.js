@@ -248,35 +248,33 @@ class PoolAllocateAndWithdraw extends React.Component {
   componentDidMount(props) {
     if(window.web3) {
       this.props.web3.eth.getAccounts().then(function(accounts) {
-      this.setState({userAddress: accounts[0]})
-    }.bind(this))
+      this.setState({userAddress: accounts[0]});
+    }.bind(this));
     this.setState({poolContract: this.props.web3.qkc.contract(ABIinterface).at(this.props.poolAddress)})
     }
   }
 
-  async addStakeTx(value) { //called when 
+  addStakeTx() { //called when "Add Stake" button is clicked
 
     const txParams = {
       gasPrice: 2,
       gas: 350000,
-      to: QuarkChain.getEthAddressFromQkcAddress(this.props.poolAddress),  // recipient of to address
-      value: value*1e18,
+      to: QuarkChain.getEthAddressFromQkcAddress(this.props.poolAddress),
+      value: this.state.add*1e18,
       fromFullShardKey: QuarkChain.getFullShardKeyFromQkcAddress(this.props.poolAddress),
       toFullShardKey: QuarkChain.getFullShardKeyFromQkcAddress(this.props.poolAddress),
       networkId: 1
   }
 
   this.props.web3.qkc.sendTransaction(txParams, function(err,res) {
-    console.log(err) //returns undefined
-    console.log(res) //returns address(0)
-  })
-
-  console.log(this.state.userAddress)
+    console.log(err) //returns null or undefined
+    console.log(res) //returns 0x0
+    });
   }
 
 
 
-  withdrawStake() {
+  withdrawStake() { //called when "Withdraw" button is clicked
 
     const txParams = {
       gasPrice: 2,
@@ -286,9 +284,9 @@ class PoolAllocateAndWithdraw extends React.Component {
     }
     
     this.state.poolContract.withdrawStakes(this.state.withdraw, txParams).then(function(err, res) {
-      console.log(err)
-      console.log(res)
-    })
+      console.log(err) //returns null or undefined
+      console.log(res) //returns 0x0
+    });
   }
 
   handleAddChange(event) {
@@ -308,7 +306,7 @@ class PoolAllocateAndWithdraw extends React.Component {
                 <input type="number" min="0" value={this.state.add} onChange={e => this.handleAddChange(e)} />
               </td>
               <td>
-                <button type="button" onClick={() => this.addStakeTx(this.state.add)}>Add Stake</button>
+                <button type="button" onClick={this.addStakeTx.bind(this)}>Add Stake</button>
               </td>
             </tr>
             <tr className="rowcolour2">
