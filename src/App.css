@@ -1,0 +1,76 @@
+.border {
+    
+  border:white
+}
+
+.borderMid {
+  border-left: 1px solid white;
+}
+
+.rowcolour1 {
+  background: #34495E;
+}
+.rowcolour2 {
+  background: #4D5656;
+}
+
+.App {
+  background-color: #202020;
+  width: 100vmax;
+  height: 100vmax
+}
+
+.href {
+  color: white;
+}
+
+.href:hover {
+  color:#202020;
+}
+
+.pool {
+  margin-bottom: 20px;
+}
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  color: #f2f2f2;
+  border: 1px solid #101010;
+  text-align: left;
+  padding: 8px;
+}
+
+body {
+  background-color: #202020;
+}
+
+.topnav {
+  background-color: #202020;
+  overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  color: #f2f2f2;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topnav a.nav {
+  float: right;
+  background-color: #101010;
+}
+
+/* Change the color of links on hover */
+.topnav a.nav:hover {
+  text-align: right;
+  background-color: #ddd;
+  color: black;
+}
