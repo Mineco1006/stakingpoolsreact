@@ -216,7 +216,7 @@ class PoolUserInterface extends React.Component {
               {this.state.stake}
             </td>
           </tr>
-          <PoolAllocateWithdraw poolAddress={this.props.poolAddress} web3={this.props.web3}/>
+          <PoolAllocateAndWithdraw poolAddress={this.props.poolAddress} web3={this.props.web3}/>
         </table>
         
     )
