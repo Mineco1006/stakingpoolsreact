@@ -2,7 +2,7 @@ import './App.css';
 import Web3 from 'web3';
 import QuarkChain from 'quarkchain-web3';
 import {ABIinterface, roiABIinterface, poolROIContractAddress, poolContractAddress, fullShardKey, jrpcUrl, standardShardKeys} from './components/config';
-import {PoolInterface, Navbar} from './components/siteComponents.js'
+import {PoolInterface, Navbar} from './components/components.js'
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -12,10 +12,7 @@ if(window.ethereum){
   web3 = new Web3(web3.givenProvider);
   QuarkChain.injectWeb3(web3, jrpcUrl);
   window.ethereum.enable();
-} else {
-  web3 = new Web3(web3.currentProvider);
 }
-
 function App() {
 
   return (

@@ -3,10 +3,44 @@ import QuarkChain from 'quarkchain-web3';
 import React from 'react';
 import axios from 'axios';
 import {ABIinterface, roiABIinterface, poolROIContractAddress, poolContractAddress, fullShardKey, jrpcUrl, standardShardKeys} from './config.js'
-import {metaMaskSignTyped, getDeviceType, sendRawTx} from '../functionCol/lib'
+import {metaMaskSignTyped, getDeviceType, sendRawTx} from '../test/lib'
 
 let web3 = new Web3();
 QuarkChain.injectWeb3(web3, jrpcUrl)
+
+class Navbar extends React.Component {
+  componentDidMount() {
+    document.title = "QKC Staking Pools"
+  }
+
+  render() {
+    return(
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style={{marginBottom:'25px'}}>
+          <div className="container-fluid">
+
+            <a className="navbar-brand" href="https://qkcstakingpools.xyz/">QuarkChain Staking Pools</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav">
+                <li class="nav-item">
+                  <a class="nav-link" href="https://t.me/joinchat/ar58V6PuG5tkM2Y0" target="_blank" rel="noreferrer">Telegram</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="https://plakolm1006.medium.com/" target="_blank" rel="noreferrer">News</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="https://twitter.com/Quark_Chain" target="_blank" rel="noreferrer">Twitter</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+    )
+  }
+}
 
 async function getContractInformation(poolAddress, poolROIAddress) {
   const roiContract = web3.qkc.contract(roiABIinterface).at(poolROIAddress);
@@ -201,7 +235,7 @@ class PoolUserInterface extends React.Component {
 
 
 
-class PoolAllocateWithdraw extends React.Component {
+class PoolAllocateAndWithdraw extends React.Component {
   //poolAddress, web3
 
   state = {
@@ -300,38 +334,4 @@ class PoolAllocateWithdraw extends React.Component {
   }
 }
 
-class Navbar extends React.Component {
-  componentDidMount() {
-    document.title = "QKC Staking Pools"
-  }
-
-  render() {
-    return(
-      <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style={{marginBottom:'25px'}}>
-          <div className="container-fluid">
-
-            <a className="navbar-brand" href="https://qkcstakingpools.xyz/">QuarkChain Staking Pools</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-              <ul class="navbar-nav">
-                <li class="nav-item">
-                  <a class="nav-link" href="https://t.me/joinchat/ar58V6PuG5tkM2Y0" target="_blank" rel="noreferrer">Telegram</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="https://plakolm1006.medium.com/" target="_blank" rel="noreferrer">News</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="https://twitter.com/Quark_Chain" target="_blank" rel="noreferrer">Twitter</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </nav>
-    )
-  }
-}
-
-export {PoolInterface, PoolAllocateWithdraw, Navbar};
+export {PoolInterface, Navbar};
