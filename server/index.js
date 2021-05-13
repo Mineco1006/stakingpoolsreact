@@ -5,8 +5,8 @@ const cors = require("cors");
 
 const db = mysql.createPool({
     host: "localhost",
-    user: "Nico",
-    password: "Nico1006",
+    user: "",
+    password: "",
     database: "stakingpools"
 });
 console.log("database connection established");
