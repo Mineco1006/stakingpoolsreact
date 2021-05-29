@@ -8,82 +8,38 @@ import {toast} from 'react-toastify';
 let web3 = new Web3();
 QuarkChain.injectWeb3(web3, jrpcUrl)
 
+axios.defaults.baseURL = "https://qkcstakingpools.xyz:500/api";
+
 export default class MinerInterface extends React.Component {
     //minerName, web3, poolAddress, poolROIAddress, index
 
     state = {
-        balance: '',
-        roi: '',
-        minStake: '',
-        poolStatus: '',
-        minerFee: '',
-        poolFee: '',
+        balance: 0,
+        roi: 0,
+        minStake: 0,
+        poolStatus: "Open",
+        minerFee: 0,
+        poolFee: 0,
         snapshotdate: ''
     }
     componentDidMount(props) {
         this.getContractInformation();
     }
         
-    getContractInformation() {
-        const roiContract = web3.qkc.contract(roiABIinterface).at(this.props.poolROIAddress);
-        const poolContract = web3.qkc.contract(ABIinterface).at(this.props.poolAddress);
-        let minerFee;
-        let poolFee;
-      
-        let v1;
-        let v2;
-        let v3;
-        let v4;
-        let v5;
-        let v6;
-        let v7;
-      
-        web3.qkc.getBalance(this.props.poolAddress, function(err, res) {
-          v1 = Number((res/10**18).toFixed(2)).toLocaleString() + " QKC";
-          this.setState({balance: v1})
-        }.bind(this));
-      
-        poolContract.minerFee.call(function(err, res){
-          minerFee = res/10000
-          v2 = res/100+"%";
-          this.setState({minerFee: v2})
-        }.bind(this));
-        poolContract.poolFee.call(function(err, res){
-          poolFee = res/10000
-          v3 = res/100+"%";
-          this.setState({poolFee: v3})
-        }.bind(this));
-    
-        poolContract.minStake.call(function(err, res){
-          v4 = Number((res/10**18).toFixed(2)).toLocaleString() + " QKC";
-          this.setState({minStake: v4})
-        }.bind(this));
-      
-        poolContract.isClosed.call(function(err, res){
-            if(res == false){
-              v5 = "Open";
-            }
-            if(res == true){  
-              v5 = "Closed";
-            }
-            this.setState({poolStatus: v5})
-        }.bind(this));
-      
-        axios.post("http://qkcstakingpools.xyz:3001/api/getSnapshot", {chainId: this.props.index}).then((response) => {
-            const data = response.data;
-            
-            web3.qkc.getBalance(this.props.poolAddress, function(err, res) {
-                const result = ((((res-Number(data.balance))/((Number(data.balance)/blockAllowance[this.props.index]).toFixed(0)*blockAllowance[this.props.index]))/((Date.now()-Number(data.timestamp))))*(1000*3600*24*30)*(1-(minerFee+poolFee))*100).toFixed(3);
-                v6 = result + "% / " + (result*12).toFixed(1) + "%";
-                let date = new Date(Number(data.timestamp))
-                v7 = date.toUTCString()
-                this.setState({roi: v6});
-                this.setState({snapshotdate: v7})
+    getContractInformation(){
+        axios.post("/getContractInfo", {chainId: this.props.index}).then((response) => {
+          const data = response.data;
+          let status = data.isClosed ? "Closed" : "Open";
 
-                axios.post("http://qkcstakingpools.xyz:3001/api/newROI", {chainId: this.props.index, roi: result})
-            }.bind(this));
+          axios.post("/getSnapshot", {chainId: this.props.index}).then(function(res){
+
+            this.setState({balance: (data.balance/1e18).toFixed(2).toLocaleString(), roi: data.roiMon, minStake: (data.minStake/1e18).toFixed(2).toLocaleString(), poolStatus: status, minerFee: (data.minerFee/1e2), poolFee: (data.poolFee/1e2), snapshotdate: String(new Date(Number(res.data.timestamp)))})
+          }.bind(this));
+            
+    
+          axios.post("/newROI", {chainId: this.props.index, roi: data.roiMon})
         });
-      }
+    }
 
     
     render() {
@@ -99,15 +55,15 @@ export default class MinerInterface extends React.Component {
                 <tbody>
                     <tr className="rowcolour2">
                         <td>Estimated ROI monthly/annual</td>
-                        <td colSpan="2">{this.state.roi}</td>
+                        <td colSpan="2">{`${this.state.roi}% / ${(this.state.roi*12).toFixed(1)}%`}</td>
                     </tr>
                     <tr className="rowcolour1">
                         <td>Total Stakes</td>
-                        <td colSpan="2">{this.state.balance}</td>
+                        <td colSpan="2">{this.state.balance} QKC</td>
                     </tr>
                     <tr className="rowcolour2">
                         <td>Minimum Stake</td>
-                        <td colSpan="2">{this.state.minStake}</td>
+                        <td colSpan="2">{this.state.minStake} QKC</td>
                     </tr>
                     <tr className="rowcolour1">
                         <td>Pool Status</td>
@@ -115,11 +71,11 @@ export default class MinerInterface extends React.Component {
                     </tr>
                     <tr className="rowcolour2">
                         <td>Miner Fee</td>
-                        <td colSpan="2">{this.state.minerFee}</td>
+                        <td colSpan="2">{this.state.minerFee}%</td>
                     </tr>
                     <tr className="rowcolour1">
                         <td>Pool Fee</td>
-                        <td colSpan="2">{this.state.poolFee}</td>
+                        <td colSpan="2">{this.state.poolFee}%</td>
                     </tr>
                     <tr className="rowcolour2">
                         <td>Last Snapshot Date</td>
@@ -146,6 +102,9 @@ class MinerChangeInterface extends React.Component {
         if(window.ethereum){
             this.props.web3.eth.getAccounts().then(function(accounts) {
                 this.setState({userAddress: accounts[0]})
+                if(!!this.props.web3.currentProvider.isQpocket){
+                    this.setState({userAddress: this.props.web3.givenProvider.address});
+                }
             }.bind(this))
         }
         
@@ -252,7 +211,7 @@ class MinerChangeInterface extends React.Component {
         
         this.state.poolContract.flushContract(txParams, function(err, res) {
             if(res != "0x000000000000000000000000000000000000000000000000000000000000000000000000" && res != undefined && res != null) {
-            toast.success(() => <div>Your <a href={`https://mainnet.quarkchain.io/tx/${res}`} target="_blank">pool fee adjustment</a> was sent successfully</div>) 
+            toast.success(({closeToast}) => <div>Your <a href={`https://mainnet.quarkchain.io/tx/${res}`} target="_blank">pool fee adjustment</a> was sent successfully</div>) 
             } else {
             toast.warn("Seems that your transaction has been declined")
             }
@@ -261,9 +220,8 @@ class MinerChangeInterface extends React.Component {
 
     takeSnaphot() {
         this.props.web3.qkc.getBalance(this.props.poolAddress, function(err, res) {
-            axios.post("http://qkcstakingpools.xyz:3001/api/newSnapshot", {chainId: this.props.index, balance: res}).then(function(err,res){
-                toast.success(() => <div>New snapshot successfully queried to database</div>)
-            }.bind(this));
+            axios.post("/newSnapshot", {chainId: this.props.index, balance: res})
+            toast.success(({closeToast}) => <div>New snapshot successfully queried to database</div>)
         }.bind(this))
     }
 

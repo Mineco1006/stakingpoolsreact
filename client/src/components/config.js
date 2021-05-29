@@ -3,8 +3,8 @@ const roiABIinterface = [{"inputs":[],"stateMutability":"nonpayable","type":"con
 const poolROIContractAddress = ["0x0", "0x0", "0xd00204F286548579eaE01357B22996B44f4b0747", "0x035f71F9e800271A9e2A2ec2a45eEAFBb298293C", "0x0", "0x0", "0x0", "0x0000000000000000000000000000000000000000"];
 const poolContractAddress = ["0x0", "0x0","0x94f151BBD12854f93cf92c882B88E3790F407956", "0x006631C067D34928F55520511f01A5aBfA0AC67a", "0x0", "0x0", "0x0", "0x948A644AC90EdBF9Bf41514e4D351cbb2fB2b6a5"];
 const fullShardKey = ["0000C66c", "0001C66c", "0002C66c", "0003C66c", "0004C66c", "0005C66c", "0006C66c", "0007C66c"];
-const jrpcUrl = "http://jrpc.mainnet.quarkchain.io:38391";
-const admin = ["0x13d041434910aD2C1893c6A77537B16Cb7b8Ef5b", "0xe94e8362a0a033c04860024afeb384dd395f5a4f", "0xdfe9a918b553d5bfa4aa6a1dba16d5286bf00fa1"]
+const jrpcUrl = "https://fullnode.qpool.net/";
+const admin = ["0x13d041434910aD2C1893c6A77537B16Cb7b8Ef5b", "0xe94E8362A0A033C04860024afeb384Dd395F5a4f", "0xdfe9A918B553D5BFa4Aa6A1DBa16d5286Bf00fa1"]
 const standardShardKeys = ["00000000", "00010000", "00020000", "00030000", "00040000", "00050000", "00060000", "00070000"]
 const blockAllowance = [0e18, 15488e18, 30976e18, 61952e18, 123904e18, 247808e18, 30976e18, 123904e18]
 export {ABIinterface, roiABIinterface, poolROIContractAddress, poolContractAddress, fullShardKey, jrpcUrl, standardShardKeys, blockAllowance, admin};
