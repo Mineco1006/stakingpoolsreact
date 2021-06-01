@@ -1,38 +1,37 @@
 const express = require("express");
-const app = express();
 const mysql = require("mysql");
 const cors = require("cors");
 const qkc = require("./quarkchain");
 const Web3 = require("web3");
 const fs = require('fs');
 const https = require('https');
+const colors = require("colors");
+
+const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-
-
-
 const db = mysql.createPool({
     host: "localhost",
-    user: "Admin",
-    password: "stakingpools@admin1006",
-    database: "stakingpools"
+    user: "root",
+    password: "",
+    database: ""
 });
-console.log("database connection established");
+console.log("[STATUS] ".magenta + "Database connection established".green);
 
-const httpsServer = https.createServer({
+/*const httpsServer = https.createServer({
     key: fs.readFileSync('/etc/letsencrypt/live/qkcstakingpools.xyz/privkey.pem'),
     cert: fs.readFileSync('/etc/letsencrypt/live/qkcstakingpools.xyz/fullchain.pem'),
-  }, app);
+  }, app);*/
 
 app.post("/api/getSnapshot", function(req, res){
     const chainId = req.body.chainId
     const sqlStatement = `SELECT * FROM snapshot WHERE id=(SELECT MAX(id) FROM snapshot WHERE chainId=(?) )` //sql select statement
     db.query(sqlStatement, [chainId], function(err, result){
         if(result != undefined && result != null) {
-           console.log("Snapshot query returned");
+           console.log("[STATUS] ".magenta + "Snapshot query returned".green);
            res.send(result[0]) ;
         }
     });
@@ -45,7 +44,7 @@ app.post("/api/newSnapshot", function(req, res){
     const balance = req.body.balance;
 
     db.query(sqlStatement, [chainId, timestamp.toString(), balance.toString()], function(err, result){
-        console.log("Took new snapshot");
+        console.log("[POST] ".magenta + "Took new snapshot".green);
     });
 });
 
@@ -55,7 +54,7 @@ app.post("/api/newROI", function(req, res){
     const chainId = req.body.chainId;
 
     db.query(sqlStatement, [chainId, roi], function(err, result){
-        console.log("Added new ROI value");
+        console.log("[POST] ".magenta + "Added new ROI value".green);
     });
 });
 
@@ -64,7 +63,7 @@ app.post("/api/getLatestROI", function(req, res){
     const sqlStatement = `SELECT * FROM roi WHERE id=(SELECT MAX(id) FROM roi WHERE chainId=(?))` //sql select statement
     db.query(sqlStatement, [chainId], function(err, result){
         if(result != undefined && result != null) {
-            console.log("Fetched ROI value");
+            console.log("[POST] ".magenta + "Fetched ROI value".green);
             res.send(result[0]);
         }
     });
@@ -72,14 +71,16 @@ app.post("/api/getLatestROI", function(req, res){
 
 app.post("/api/getContractInfo", function(req, res){
     const chainId = req.body.chainId;
-    const sqlStatement = `SELECT * FROM snapshot WHERE id=(SELECT MAX(id) FROM snapshot WHERE chainId=(?) )` //sql select statement
+    const sqlStatement = `SELECT * FROM snapshot WHERE id=(SELECT MAX(id) FROM snapshot WHERE chainId=(?))` //sql select statement
 
     db.query(sqlStatement, [chainId], function(err, result){
         if(result != undefined && result != null) {
            qkc.getContractInfo(chainId, result[0]).then((resolve) => {
                res.send(resolve);
-               console.log("Contract information returned");
+               console.log("[POST] ".magenta + "Contract information returned".green);
            });
+        } else {
+            console.log("[ERROR] ".magenta + "Could not fetch snapshot from database".red);
         }
     });
 });
@@ -92,24 +93,10 @@ app.post("/api/getUserInformation", function(req, res){
         if(address.length == 50){
             qkc.getUserInformation(address, chainId).then((resolve) => {
                 res.send(resolve);
-                console.log("User information returned");
+                console.log("[POST] ".magenta + "User information returned".green);
             });
         }
     }
-});
-
-app.post("/api/getNonce", function(req, res){
-    const address = req.body.address;
-
-    if(typeof address == "string"){
-        if(address.length == 50){
-            qkc.getNonce(address).then((resolve) => {
-                res.send({resolve});
-                console.log("Nonce fetched")
-            });
-        }
-    }
-
 });
 
 app.post("/api/logTx", function(req, res){
@@ -124,12 +111,34 @@ app.post("/api/logTx", function(req, res){
     const sqlStatement = `INSERT INTO transactions (chainId, address, type, amount, bonus, txId) VALUES (?, ?, ?, ?, ?, ?);` //sql select statement
     
     db.query(sqlStatement, [chainId, address, type, amount, bonus, txId], function(err, result){
-        console.log("New transaction logged");
+        console.log("[POST] ".magenta + "New transaction logged".green);
     });
 });
 
+app.post("/api/getBonus", function(req, res){
+    const identifier = req.body.identifier;
+    const chainId = req.body.chainId;
 
+    var sqlStatement;
 
-httpsServer.listen(500, ()=>{
-    console.log("running on port 500");
+    if(typeof identifier == "number") {
+        sqlStatement = `SELECT * FROM transactions WHERE chainId=(?);`
+    } else if(typeof identifier == "string"){
+        sqlStatement = `SELECT * FROM transactions WHERE address=(?) AND chainId=(?);`
+    }
+
+    db.query(sqlStatement, [identifier, chainId], function(err, result){
+        if(result != undefined && result != null) {
+            const resolve = qkc.getBonus(result);
+            res.send({res: resolve});
+            console.log("[POST] ".magenta + "Bonus query successfully returned".green);
+        } else {
+            console.log("[ERROR] ".magenta + "Could not fetch bonus from database".red);
+        }
+        
+    });
+});
+
+app.listen(3001, ()=>{
+    console.log("[STATUS] ".magenta + "running on port 3001".green);
 });

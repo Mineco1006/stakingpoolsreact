@@ -2,13 +2,13 @@ import Web3 from 'web3';
 import QuarkChain from 'quarkchain-web3';
 import React from 'react';
 import axios from 'axios';
-import {ABIinterface, roiABIinterface, jrpcUrl, blockAllowance, admin} from './config.js';
+import {ABIinterface, jrpcUrl, admin, baseURL} from './config.js';
 import {toast} from 'react-toastify';
 
 let web3 = new Web3();
 QuarkChain.injectWeb3(web3, jrpcUrl)
 
-axios.defaults.baseURL = "https://qkcstakingpools.xyz:500/api";
+axios.defaults.baseURL = baseURL;
 
 export default class MinerInterface extends React.Component {
     //minerName, web3, poolAddress, poolROIAddress, index
@@ -23,6 +23,7 @@ export default class MinerInterface extends React.Component {
         snapshotdate: ''
     }
     componentDidMount(props) {
+        axios.defaults.baseURL = baseURL;
         this.getContractInformation();
     }
         
@@ -33,7 +34,7 @@ export default class MinerInterface extends React.Component {
 
           axios.post("/getSnapshot", {chainId: this.props.index}).then(function(res){
 
-            this.setState({balance: (data.balance/1e18).toFixed(2).toLocaleString(), roi: data.roiMon, minStake: (data.minStake/1e18).toFixed(2).toLocaleString(), poolStatus: status, minerFee: (data.minerFee/1e2), poolFee: (data.poolFee/1e2), snapshotdate: String(new Date(Number(res.data.timestamp)))})
+            this.setState({balance: (data.balance/1e18).toFixed(2), roi: data.roiMon ?? 0, minStake: (data.minStake/1e18).toFixed(2), poolStatus: status, minerFee: (data.minerFee/1e2), poolFee: (data.poolFee/1e2), snapshotdate: String(new Date(Number(res.data.timestamp)))})
           }.bind(this));
             
     
@@ -59,11 +60,11 @@ export default class MinerInterface extends React.Component {
                     </tr>
                     <tr className="rowcolour1">
                         <td>Total Stakes</td>
-                        <td colSpan="2">{this.state.balance} QKC</td>
+                        <td colSpan="2">{Number(this.state.balance).toLocaleString} QKC</td>
                     </tr>
                     <tr className="rowcolour2">
                         <td>Minimum Stake</td>
-                        <td colSpan="2">{this.state.minStake} QKC</td>
+                        <td colSpan="2">{Number(this.state.minStake).toLocaleString} QKC</td>
                     </tr>
                     <tr className="rowcolour1">
                         <td>Pool Status</td>
@@ -134,7 +135,7 @@ class MinerChangeInterface extends React.Component {
         
         this.state.poolContract.adjustMinStake((this.state.minStake*1e18), txParams, function(err, res) {
             console.log(res)
-          if(res != "0x000000000000000000000000000000000000000000000000000000000000000000000000" && res != undefined && res != null) {
+          if(parseInt(res) != 0 && res != undefined && res != null) {
             toast.success(({ closeToast }) => <div>Your <a href={`https://mainnet.quarkchain.io/tx/${res}`} target="_blank">min stake adjustment</a> was sent successfully</div>) 
           } else {
             toast.warn("Seems that your transaction has been declined")
@@ -152,8 +153,8 @@ class MinerChangeInterface extends React.Component {
             networkId: 1
         }
         
-        this.state.poolContract.adjustMinerFee((this.state.minerFee*100).toFixed(2), txParams, function(err, res) {
-            if(res != "0x000000000000000000000000000000000000000000000000000000000000000000000000" && res != undefined && res != null) {
+        this.state.poolContract.adjustMinerFee((this.state.minerFee*100).toFixed(0), txParams, function(err, res) {
+            if(parseInt(res) != 0 && res != undefined && res != null) {
             toast.success(({ closeToast }) => <div>Your <a href={`https://mainnet.quarkchain.io/tx/${res}`} target="_blank">miner fee adjustment</a> was sent successfully</div>) 
             } else {
             toast.warn("Seems that your transaction has been declined")
@@ -171,8 +172,8 @@ class MinerChangeInterface extends React.Component {
             networkId: 1
         }
         
-        this.state.poolContract.adjustPoolFee((this.state.poolFee).toFixed(2)*100, txParams, function(err, res) {
-            if(res != "0x000000000000000000000000000000000000000000000000000000000000000000000000" && res != undefined && res != null) {
+        this.state.poolContract.adjustPoolFee((this.state.poolFee*100).toFixed(0), txParams, function(err, res) {
+            if(parseInt(res) != 0 && res != undefined && res != null) {
             toast.success(({ closeToast }) => <div>Your <a href={`https://mainnet.quarkchain.io/tx/${res}`} target="_blank">pool fee adjustment</a> was sent successfully</div>) 
             } else {
             toast.warn("Seems that your transaction has been declined")
@@ -191,7 +192,7 @@ class MinerChangeInterface extends React.Component {
         }
         
         this.state.poolContract.adjustPoolFee(status, txParams, function(err, res) {
-            if(res != "0x000000000000000000000000000000000000000000000000000000000000000000000000" && res != undefined && res != null) {
+            if(parseInt(res) != 0 && res != undefined && res != null) {
             toast.success(({ closeToast }) => <div>Your <a href={`https://mainnet.quarkchain.io/tx/${res}`} target="_blank">pool fee adjustment</a> was sent successfully</div>) 
             } else {
             toast.warn("Seems that your transaction has been declined")
@@ -210,7 +211,7 @@ class MinerChangeInterface extends React.Component {
         }
         
         this.state.poolContract.flushContract(txParams, function(err, res) {
-            if(res != "0x000000000000000000000000000000000000000000000000000000000000000000000000" && res != undefined && res != null) {
+            if(parseInt(res) != 0 && res != undefined && res != null) {
             toast.success(({closeToast}) => <div>Your <a href={`https://mainnet.quarkchain.io/tx/${res}`} target="_blank">pool fee adjustment</a> was sent successfully</div>) 
             } else {
             toast.warn("Seems that your transaction has been declined")

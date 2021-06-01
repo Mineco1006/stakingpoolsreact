@@ -1,12 +1,12 @@
 import QuarkChain from 'quarkchain-web3';
 import React from 'react';
 import axios from 'axios';
-import {ABIinterface, standardShardKeys} from './config.js';
+import {ABIinterface, standardShardKeys, baseURL} from './config.js';
 import {toast} from 'react-toastify';
 
-axios.defaults.baseURL = "https://qkcstakingpools.xyz:500/api";
+axios.defaults.baseURL = baseURL;
 
-  class PoolUserInterface extends React.Component {
+class PoolUserInterface extends React.Component {
     //poolAddress, web3, index
   
     state = {
@@ -17,17 +17,21 @@ axios.defaults.baseURL = "https://qkcstakingpools.xyz:500/api";
       poolContract: '',
 
       userBalance: 0,
-      stake: 0
+      stake: 0,
+      userBonus: 0
     }
 
     componentDidMount(props) {
+      axios.defaults.baseURL = baseURL;
       if(window.web3) {
         this.props.web3.eth.getAccounts().then(function(accounts) {
-          console.log(this.props.web3.eth.accounts[0])
         this.setState({userAddress: accounts[0], poolContract: this.props.web3.qkc.contract(ABIinterface).at(this.props.poolAddress)});
         if(!!this.props.web3.currentProvider.isQpocket){
           this.setState({userAddress: this.props.web3.givenProvider.address});
         }
+          axios.post("/getBonus", {identifier: this.state.userAddress, chainId: Number(this.props.index)}).then((response) => {
+            this.setState({userBonus: response.data.res});
+          });
           axios.post("/getUserInformation", {address: (this.state.userAddress+standardShardKeys[this.props.index]), chainId: this.props.index}).then(function(resolve){
             this.setState({stake: (resolve.data.stake*1e-18).toFixed(2), userBalance: (resolve.data.balance*1e-18).toFixed(2)})
             
@@ -38,7 +42,7 @@ axios.defaults.baseURL = "https://qkcstakingpools.xyz:500/api";
   
     addStakeTx() { //called when "Add Stake" button is clicked
 
-      if(this.state.add > this.state.userBalance) {
+      if(this.state.add >= this.state.userBalance) {
         toast.warn(`Insufficent funds on chain ${this.props.index}`)
         return
       }
@@ -64,8 +68,7 @@ axios.defaults.baseURL = "https://qkcstakingpools.xyz:500/api";
       } else {
         toast.warn("Seems that your transaction has been declined")
         }
-      }.bind(this));
-         
+      }.bind(this));   
     }
   
   
@@ -103,10 +106,14 @@ axios.defaults.baseURL = "https://qkcstakingpools.xyz:500/api";
     }
   
     handleAddChange(event) {
-      this.setState({add: event.target.value});
+      if(event.target.value >= 0){
+        this.setState({add: event.target.value});
+      }
     }
     handleWithdrawChange(event) {
-      this.setState({withdraw: event.target.value});
+      if(event.target.value >= 0){
+        this.setState({withdraw: event.target.value});
+      }
     }
     
     render() {
@@ -126,12 +133,12 @@ axios.defaults.baseURL = "https://qkcstakingpools.xyz:500/api";
                   Your Chain {this.props.index} Pool Stake
                 </td>
                 <td colSpan="2">
-                  {(this.state.stake).toLocaleString()}
+                  {Number(this.state.stake).toLocaleString()}
                 </td>
               </tr>
               <tr className="rowcolour1">
                 <td>Your Chain {this.props.index} Balance</td>
-                <td colSpan="2">{(this.state.userBalance).toLocaleString()}</td>
+                <td colSpan="2">{Number(this.state.userBalance).toLocaleString()}</td>
               </tr>
               <tr className="rowcolour2">
                 <td>Deposit</td>

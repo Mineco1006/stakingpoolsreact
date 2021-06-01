@@ -7,8 +7,8 @@ const axios = require("axios");
 
 module.exports.getContractInfo =  function(chainId, snapshot){
     var web3 = new Web3();
-    QuarkChain.injectWeb3(web3, "http://jrpc.mainnet.quarkchain.io:38391");
-
+    QuarkChain.injectWeb3(web3, "http://jrpc.mainnet.quarkchain.io:38391/");
+    
     //return values decl
     var bal;
     var minerFee;
@@ -80,20 +80,23 @@ module.exports.getUserInformation = function(address, chainId){
     });
 }
 
-module.exports.getNonce = function(address){
-    var web3 = new Web3();
-    QuarkChain.injectWeb3(web3, "http://jrpc.mainnet.quarkchain.io:38391");
-
-    return new Promise((resolve) => {
-       web3.qkc.getTransactionCount(address, function(err, res){
-            resolve(res);
-        }); 
-    })
+module.exports.calcBonus = function(amount, chainId){ //calculates bonus for database queries
+    if(chainId != 2){
+        const bonusRel = constants.bonusRel;
+        const bonus = amount*bonusRel;
+        return bonus;
+    } else {
+        return 0;
+    }
 }
 
-module.exports.calcBonus = function(amount){
-    const bonusRel = constants.bonusRel;
-    const bonus = amount*bonusRel;
-
-    return bonus;
+module.exports.getBonus = function(SQLArray){ //sums bonuses of a specific address or chainId
+    var amount = 0;
+    if(Array.isArray(SQLArray)){
+        
+        for(var i = 0; i < SQLArray.length; i++){
+            amount += SQLArray[i].bonus;
+        }
+    }
+    return amount;
 }

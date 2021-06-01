@@ -13,8 +13,9 @@ export default class Miner extends React.Component {
     render(){
         return (
         <div className="container" style={{backgroundColor:'#202020'}}>
-          <MinerInterface minerName="Marc" poolAddress={poolContractAddress[2] + fullShardKey[2]} poolROIAddress={poolROIContractAddress[2] + fullShardKey[2]} index="2" web3={this.props.web3}/>
-          <MinerInterface minerName="Bukum" poolAddress={poolContractAddress[3] + fullShardKey[3]} poolROIAddress={poolROIContractAddress[3] + fullShardKey[3]} index="3" web3={this.props.web3}/>
+          <MinerInterface minerName="Marc" poolAddress={poolContractAddress[2] + fullShardKey[2]} index="2" web3={this.props.web3}/>
+          <MinerInterface minerName="Bukum" poolAddress={poolContractAddress[3] + fullShardKey[3]} index="3" web3={this.props.web3}/>
+          <MinerInterface minerName="Marc" poolAddress={poolContractAddress[7] + fullShardKey[7]} index="7" web3={this.props.web3}/>
         </div>
         )
     }
