@@ -15,9 +15,15 @@ app.use(express.urlencoded({extended: true}));
 
 const db = mysql.createPool({
     host: "localhost",
-    user: "root",
+<<<<<<< HEAD
+    user: "",
     password: "",
-    database: ""
+    database: "stakingpools"
+=======
+    user: "",
+    password: "",
+    database: "stakingpools"
+>>>>>>> 6dbbd6e61dabe74a943bce4c8571c354ed944fa8
 });
 console.log("[STATUS] ".magenta + "Database connection established".green);
 
@@ -140,5 +146,10 @@ app.post("/api/getBonus", function(req, res){
 });
 
 app.listen(3001, ()=>{
+<<<<<<< HEAD
     console.log("[STATUS] ".magenta + "running on port 3001".green);
 });
+=======
+    console.log("running on port 3001")
+});
+>>>>>>> 6dbbd6e61dabe74a943bce4c8571c354ed944fa8
