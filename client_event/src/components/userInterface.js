@@ -26,6 +26,9 @@ class PoolUserInterface extends React.Component {
       if(window.ethereum) {
         this.props.web3.eth.getAccounts().then(function(accounts) {
         this.setState({userAddress: accounts[0], poolContract: this.props.web3.qkc.contract(ABIinterface).at(this.props.poolAddress)});
+        if(!!this.props.web3.currentProvider.isQpocket){
+          this.setState({userAddress: this.props.web3.givenProvider.address});
+        }
           axios.post("/getBonus", {identifier: this.state.userAddress, chainId: Number(this.props.index)}).then((response) => {
             this.setState({userBonus: response.data.res});
           });
@@ -117,7 +120,7 @@ class PoolUserInterface extends React.Component {
       if(window.ethereum) {
         return (
           <tbody>
-              <tr className="rowcolour1">
+              <tr className="rowcolour2">
                 <td>
                   Your Address
                 </td>
@@ -125,17 +128,17 @@ class PoolUserInterface extends React.Component {
                   {this.state.userAddress + standardShardKeys[this.props.index]}
                 </td>
               </tr>
-              <tr className="rowcolour2">
+              <tr className="rowcolour1">
                 <td>
                   Your Chain {this.props.index} Pool Stake
                 </td>
                 <td colSpan="2">{Number(this.state.stake).toLocaleString()} QKC</td>
               </tr>
-              <tr className="rowcolour1">
+              <tr className="rowcolour2">
                 <td>Your Chain {this.props.index} Balance</td>
                 <td colSpan="2">{Number(this.state.userBalance).toLocaleString()} QKC</td>
               </tr>
-              <tr className="rowcolour2">
+              <tr className="rowcolour1">
                 <td>Deposit</td>
                 <td>
                   <input className="inp" type="number" min="0" max={this.state.userBalance} placeholder={`Deposit Value To Chain ${this.props.index} Pool In QKC`} value={this.state.add} onChange={e => this.handleAddChange(e)} />
@@ -144,7 +147,7 @@ class PoolUserInterface extends React.Component {
                   <button className="but" onClick={this.addStakeTx.bind(this)}>Deposit</button>
                 </td>
               </tr>
-              <tr className="rowcolour1">
+              <tr className="rowcolour2">
                 <td>Withdraw</td>
                 <td>
                   <input className="inp" type="number" min="0" max={this.state.stake} placeholder={`Withdrawal Value From Chain ${this.props.index} Pool In QKC`} value={this.state.withdraw} onChange={e => this.handleWithdrawChange(e)} />
@@ -153,12 +156,16 @@ class PoolUserInterface extends React.Component {
                   <button className="but" onClick={this.withdrawStake.bind(this)}>Withdraw</button>
                 </td>
               </tr>
+              <tr className="rowcolour1">
+                <td>Your Chain {this.props.index} Bonus</td>
+                <td colSpan="2">{this.state.userBonus} QKC</td>
+              </tr>
           </tbody>
         )
       } else {
         return (
           <tbody>
-            <tr className="rowcolour1">
+            <tr className="rowcolour2">
               <td colSpan="2">
                 Please enable your web3 wallet to check your stake
               </td>

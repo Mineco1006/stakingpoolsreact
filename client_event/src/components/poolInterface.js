@@ -19,7 +19,7 @@ class PoolInterface extends React.Component {
     balance : 0,
     roi : 0,
     minStake : 0,
-    poolStatus : <a style={{color: "#90ee90"}}>Open</a>,
+    poolStatus : "Open",
     poolBonus: poolBonus[this.props.index]
   }
 
@@ -31,7 +31,7 @@ class PoolInterface extends React.Component {
       }
       
       const data = response.data;
-      let status = data.isClosed ? <a style={{color: "#ff726f"}}>Closed (deposits suspended)</a> : <a style={{color: "#90ee90"}}>Open</a>;
+      let status = data.isClosed ? "Closed" : "Open";
 
       this.setState({balance: (data.balance/1e18).toFixed(2), roi: data.roiMon ?? 0, minStake: (data.minStake/1e18).toFixed(2), poolStatus: status})
 
@@ -79,6 +79,10 @@ class PoolInterface extends React.Component {
               <td colSpan="2">
                 <a className="href" href="https://t.me/joinchat/ar58V6PuG5tkM2Y0">{this.props.miner}</a>
               </td>
+            </tr>
+            <tr className="rowcolour1">
+              <td>Bonus Rewards Left</td>
+              <td colSpan="2">{`${(this.state.poolBonus).toLocaleString()}/${(poolBonus[this.props.index]).toLocaleString()} QKC`}</td>
             </tr>
         </tbody>
         <PoolUserInterface poolAddress={this.props.poolAddress} web3={this.props.web3} index={this.props.index}/>

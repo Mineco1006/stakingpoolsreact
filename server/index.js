@@ -15,29 +15,23 @@ app.use(express.urlencoded({extended: true}));
 
 const db = mysql.createPool({
     host: "localhost",
-<<<<<<< HEAD
-    user: "",
-    password: "",
+    user: "Admin",
+    password: "stakingpools@admin1006",
     database: "stakingpools"
-=======
-    user: "",
-    password: "",
-    database: "stakingpools"
->>>>>>> 6dbbd6e61dabe74a943bce4c8571c354ed944fa8
 });
 console.log("[STATUS] ".magenta + "Database connection established".green);
 
-/*const httpsServer = https.createServer({
+const httpsServer = https.createServer({
     key: fs.readFileSync('/etc/letsencrypt/live/qkcstakingpools.xyz/privkey.pem'),
     cert: fs.readFileSync('/etc/letsencrypt/live/qkcstakingpools.xyz/fullchain.pem'),
-  }, app);*/
+  }, app);
 
 app.post("/api/getSnapshot", function(req, res){
     const chainId = req.body.chainId
     const sqlStatement = `SELECT * FROM snapshot WHERE id=(SELECT MAX(id) FROM snapshot WHERE chainId=(?) )` //sql select statement
     db.query(sqlStatement, [chainId], function(err, result){
         if(result != undefined && result != null) {
-           console.log("[STATUS] ".magenta + "Snapshot query returned".green);
+           console.log("[POST] ".magenta + "Snapshot query returned".green);
            res.send(result[0]) ;
         }
     });
@@ -145,11 +139,6 @@ app.post("/api/getBonus", function(req, res){
     });
 });
 
-app.listen(3001, ()=>{
-<<<<<<< HEAD
+httpsServer.listen(500, ()=>{
     console.log("[STATUS] ".magenta + "running on port 3001".green);
 });
-=======
-    console.log("running on port 3001")
-});
->>>>>>> 6dbbd6e61dabe74a943bce4c8571c354ed944fa8

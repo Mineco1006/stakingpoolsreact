@@ -9,6 +9,7 @@
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
     "cors": "^2.8.5",
+    "decimal": "^0.0.2",
     "ethereumjs-tx": "^2.1.2",
     "ethers": "^5.2.0",
     "express": "^4.17.1",
